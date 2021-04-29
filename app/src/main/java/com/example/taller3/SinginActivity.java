@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -180,11 +181,19 @@ public class SinginActivity extends AppCompatActivity {
             Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
             storageReference = storage.getReference("profilePics");
             final StorageReference imageReference = storageReference.child(imageUri.getLastPathSegment());
-            pickerPath = imageUri.getLastPathSegment();
-            imageReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            imageReference.putFile(imageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if(!task.isSuccessful()){
+                        throw task.getException();
+                    }
+                    return imageReference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
                     urlProfilePicture.setImageBitmap(selectedImage);
+                    pickerPath = task.getResult().toString();
                 }
             });
 
@@ -198,12 +207,20 @@ public class SinginActivity extends AppCompatActivity {
 
             Uri photoURI = Uri.parse(path);
             storageReference = storage.getReference("profilePics");
-            pickerPath = System.currentTimeMillis() + ".jpeg";
-            final StorageReference imageReference = storageReference.child(pickerPath);
-            imageReference.putFile(photoURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            final StorageReference imageReference = storageReference.child(System.currentTimeMillis() + ".jpeg");
+            imageReference.putFile(photoURI).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if(!task.isSuccessful()){
+                        throw task.getException();
+                    }
+                    return imageReference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
                     urlProfilePicture.setImageBitmap(bitmap);
+                    pickerPath = task.getResult().toString();
                 }
             });
         }
@@ -229,7 +246,7 @@ public class SinginActivity extends AppCompatActivity {
 
     private void updateUI (FirebaseUser user){
         if(user != null){
-            startActivity(new Intent(this, HomeScreenActivity.class));
+            startActivity(new Intent(this, UserListActivity.class));
 
         }else{
             email.setText("");

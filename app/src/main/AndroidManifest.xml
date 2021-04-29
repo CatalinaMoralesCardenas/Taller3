@@ -3,7 +3,7 @@
     package="com.example.taller3">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.CAMERA" /> <!-- Avoid execute the application in devices without camera -->
@@ -18,7 +18,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Taller3">
-        <activity android:name=".HomeScreenActivity"></activity>
+        <activity android:name=".RealTimePositionActivity"></activity>
+        <activity android:name=".UserListActivity" />
+        <activity android:name=".HomeScreenActivity" />
         <activity android:name=".SinginActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity">
