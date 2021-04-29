@@ -1,5 +1,7 @@
 package com.example.taller3;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class User {
 
     private String name;
@@ -8,17 +10,21 @@ public class User {
     private String pasword;
     private String urlProfilePicture;
     private long cc;
+    private double lalitude;
+    private double longitude;
 
     public User() {
     }
 
-    public User(String name, String lastname, String email, String pasword, String urlProfilePicture, long cc) {
+    public User(String name, String lastname, String email, String pasword, String urlProfilePicture, long cc, double lalitude, double longitude) {
         this.name = name;
         this.lastname = lastname;
         this.email = email;
         this.pasword = pasword;
         this.urlProfilePicture = urlProfilePicture;
         this.cc = cc;
+        this.lalitude = lalitude;
+        this.longitude = longitude;
     }
 
     public String getName() {
@@ -67,5 +73,21 @@ public class User {
 
     public void setCc(long cc) {
         this.cc = cc;
+    }
+
+    public double getLalitude() {
+        return lalitude;
+    }
+
+    public void setLalitude(double lalitude) {
+        this.lalitude = lalitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }

@@ -125,7 +125,7 @@ public class SinginActivity extends AppCompatActivity {
                                     Log.d(TAG, "createUserWithEmail:success");
                                     FirebaseUser fUser = mAuth.getCurrentUser();
                                     updateUI(fUser);
-                                    User regis = new User(rName, rLastname, rEmail, rPassword, pickerPath, Long.parseLong(rCc));
+                                    User regis = new User(rName, rLastname, rEmail, rPassword, pickerPath, Long.parseLong(rCc), 0.0, 0.0);
 
                                     String folder = "users";
                                     FirebaseDatabase.getInstance().getReference(folder)
