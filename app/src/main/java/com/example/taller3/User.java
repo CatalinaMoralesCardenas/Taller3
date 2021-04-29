@@ -1,7 +1,5 @@
 package com.example.taller3;
 
-import com.google.android.gms.maps.model.LatLng;
-
 public class User {
 
     private String name;
