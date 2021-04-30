@@ -39,7 +39,6 @@
         <activity
             android:name=".HomeScreenMapsActivity"
             android:label="@string/title_activity_home_screen_maps"></activity>
-        <activity android:name=".HomeScreenActivity" />
         <activity android:name=".SinginActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity">
