@@ -316,8 +316,8 @@ public class HomeScreenMapsActivity extends FragmentActivity implements OnMapRea
 
     private LocationRequest createLocationRequest() {
         LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(5000);
+        locationRequest.setInterval(300000);
+        locationRequest.setFastestInterval(200000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         return locationRequest;
 
