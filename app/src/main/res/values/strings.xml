@@ -12,4 +12,5 @@
     <string name="loginPage">Inicio Sesión</string>
     <string name="create">Crear Cuenta</string>
     <string name="loginButton">Iniciar Sesión</string>
+    <string name="title_activity_home_screen_maps">Map</string>
 </resources>
