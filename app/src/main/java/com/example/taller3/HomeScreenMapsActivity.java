@@ -2,6 +2,7 @@ package com.example.taller3;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -22,8 +23,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -51,8 +54,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,11 +69,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-public class HomeScreenMapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap mMap;
     private ActivityHomeScreenMapsBinding binding;
-
+    DrawerLayout drawer;
+    ImageView imagen;
 
     private Marker locationM;
     private Marker searchM;
@@ -87,8 +95,10 @@ public class HomeScreenMapsActivity extends FragmentActivity implements OnMapRea
 
     //Firebase
     private FirebaseAuth mAuth;
+    private FirebaseUser user;
     private FirebaseDatabase database;
     private DatabaseReference dbReference;
+    String userID;
 
     //Settings
     private static final int SETTINGS_GPS = 20;
@@ -103,14 +113,25 @@ public class HomeScreenMapsActivity extends FragmentActivity implements OnMapRea
         binding = ActivityHomeScreenMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        drawer = findViewById(R.id.drawer_layout);
+
+        imagen = findViewById(R.id.imgPerfil);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        mAuth = FirebaseAuth.getInstance();
-
-        database = FirebaseDatabase.getInstance();
+        //imagenPerfil();
 
         locationRequest = createLocationRequest();
         clientLocation = LocationServices.getFusedLocationProviderClient(this);
@@ -127,6 +148,14 @@ public class HomeScreenMapsActivity extends FragmentActivity implements OnMapRea
         };
         requestPermission(this, permLocation, "Needed", LOCATION_PERMISSION_ID);
         initView();
+
+
+    }
+
+    private void imagenPerfil() {
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        userID = user.getUid();
+        dbReference = FirebaseDatabase.getInstance().getReference("users");
 
 
     }
@@ -208,11 +237,11 @@ public class HomeScreenMapsActivity extends FragmentActivity implements OnMapRea
             posicionActual = myLocation;
         }
 
-        if (myLocation != posicionActual) {
+       /* if (myLocation != posicionActual) {
             dbReference = database.getReference("location/" + mAuth.getUid());
             dbReference.setValue(myLocation);
             posicionActual = myLocation;
-        }
+        }*/
         locationMarker = mMap.addMarker(new MarkerOptions().position(myLocation).title("Tu Ubicación"));
         if (contador == 0) {
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
@@ -356,4 +385,30 @@ public class HomeScreenMapsActivity extends FragmentActivity implements OnMapRea
         stopLocationUpdates();
     }
 
+    @Override
+    public void onBackPressed() {
+        if(drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
+        }else{
+            super.onBackPressed();
+        }
+
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.nv_disponbilidad:
+                break;
+
+            case R.id.nv_users:
+                break;
+
+            case R.id.nv_logout:
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+        }
+        return true;
+    }
 }

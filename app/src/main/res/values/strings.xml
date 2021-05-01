@@ -13,4 +13,7 @@
     <string name="create">Crear Cuenta</string>
     <string name="loginButton">Iniciar Sesión</string>
     <string name="title_activity_home_screen_maps">Map</string>
+
+    <string name="navigation_drawer_open">Open Navigation Drawer</string>
+    <string name="navigation_drawer_close">Close Navigation Drawer</string>
 </resources>
