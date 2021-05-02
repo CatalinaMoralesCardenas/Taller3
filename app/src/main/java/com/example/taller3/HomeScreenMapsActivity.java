@@ -75,6 +75,7 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
     private ActivityHomeScreenMapsBinding binding;
     DrawerLayout drawer;
     ImageView imagen;
+    NavigationView navigationView;
 
     private Marker locationM;
     private Marker searchM;
@@ -110,21 +111,23 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         binding = ActivityHomeScreenMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        navigationView = findViewById(R.id.nav_view);
+        drawer = findViewById(R.id.drawer_layout);
+        imagen = findViewById(R.id.imgPerfil);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        drawer = findViewById(R.id.drawer_layout);
-
-        imagen = findViewById(R.id.imgPerfil);
+        navigationView.bringToFront();
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+        navigationView.setNavigationItemSelectedListener(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -137,18 +140,16 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
         clientLocation = LocationServices.getFusedLocationProviderClient(this);
         locationCallback = new LocationCallback() {
             @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                super.onLocationResult(locationResult);
+            public void onLocationResult(LocationResult locationResult) {
                 Location location = locationResult.getLastLocation();
                 if (location != null) {
                     updateLocation();
                 }
-
             }
         };
+
         requestPermission(this, permLocation, "Needed", LOCATION_PERMISSION_ID);
         initView();
-
 
     }
 
@@ -228,6 +229,16 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
 
     }
 
+    private void placeMarkers() {
+        for (Ubicacion place : ubicaciones) {
+            LatLng position = new LatLng(place.getLatitude(), place.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(position).title(place.getName()));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+        }
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+
+    }
+
     private void marcadorUbicacion(Location location) {
         int contador = 0;
         LatLng myLocation = new LatLng(location.getLatitude(), location.getLongitude());
@@ -236,7 +247,6 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
         } else {
             posicionActual = myLocation;
         }
-
        /* if (myLocation != posicionActual) {
             dbReference = database.getReference("location/" + mAuth.getUid());
             dbReference.setValue(myLocation);
@@ -270,12 +280,7 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
 
         try {
             readMarkersJson();
-            for (Ubicacion place : ubicaciones) {
-                LatLng position = new LatLng(place.getLatitude(), place.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(position).title(place.getName()));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-            }
-            mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+            placeMarkers();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -353,12 +358,11 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
     }
 
     private LocationRequest createLocationRequest() {
-        LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(300000);
-        locationRequest.setFastestInterval(200000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        return locationRequest;
-
+        LocationRequest myRequest = new LocationRequest();
+        myRequest.setInterval(1000);
+        myRequest.setFastestInterval(5000);
+        myRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return myRequest;
     }
 
     private void startLocationUpdates() {
@@ -396,12 +400,29 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == SETTINGS_GPS){
+            startLocationUpdates();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == LOCATION_PERMISSION_ID){
+            initView();
+        }
+    }
+
+    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.nv_disponbilidad:
                 break;
 
             case R.id.nv_users:
+
                 break;
 
             case R.id.nv_logout:
@@ -411,4 +432,6 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
         }
         return true;
     }
+
+
 }
