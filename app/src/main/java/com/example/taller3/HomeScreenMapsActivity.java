@@ -15,6 +15,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
@@ -68,6 +71,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
@@ -106,6 +112,9 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
 
     //Json
     private ArrayList<Ubicacion> ubicaciones;
+
+    private Boolean estado = false;
+    private List<String> values = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,7 +166,6 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
         user = FirebaseAuth.getInstance().getCurrentUser();
         userID = user.getUid();
         dbReference = FirebaseDatabase.getInstance().getReference("users");
-
 
     }
 
@@ -419,6 +427,7 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.nv_disponbilidad:
+                setEstado();
                 break;
 
             case R.id.nv_users:
@@ -431,6 +440,11 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
                 finish();
         }
         return true;
+    }
+
+    private void setEstado() {
+        estado = !estado;
+        
     }
 
 
