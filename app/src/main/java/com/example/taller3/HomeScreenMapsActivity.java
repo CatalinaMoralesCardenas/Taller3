@@ -62,6 +62,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
@@ -90,6 +91,8 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
     LocationCallback locationCallback;
     private Marker locationMarker;
     private LatLng posicionActual = null;
+    private double latitud;
+    private double longitud;
 
     //Permisos
     String permLocation = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -255,12 +258,19 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
         } else {
             posicionActual = myLocation;
         }
-       /* if (myLocation != posicionActual) {
-            dbReference = database.getReference("location/" + mAuth.getUid());
-            dbReference.setValue(myLocation);
-            posicionActual = myLocation;
-        }*/
-        locationMarker = mMap.addMarker(new MarkerOptions().position(myLocation).title("Tu Ubicación"));
+       if (myLocation != posicionActual) {
+           latitud = myLocation.latitude;
+           longitud = myLocation.longitude;
+           posicionActual = myLocation;
+           user = FirebaseAuth.getInstance().getCurrentUser();
+           userID = user.getUid();
+           DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+           DatabaseReference latRef = rootRef.child("users").child(userID).child("lalitude");
+           latRef.setValue(latitud);
+           DatabaseReference longRef = rootRef.child("users").child(userID).child("longitude");
+           longRef.setValue(longitud);
+        }
+        locationMarker = mMap.addMarker(new MarkerOptions().position(myLocation).title("Tú Ubicación").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
         if (contador == 0) {
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
             mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
@@ -427,7 +437,20 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.nv_disponbilidad:
-                setEstado();
+                estado = !estado;
+                user = FirebaseAuth.getInstance().getCurrentUser();
+                userID = user.getUid();
+                DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+                DatabaseReference referralRef = rootRef.child("users").child(userID).child("availability");
+                referralRef.setValue(estado);
+
+                if(estado){
+                    item.setIcon(ContextCompat.getDrawable(this, R.drawable.available));
+                }
+                if(!estado){
+                    item.setIcon(ContextCompat.getDrawable(this, R.drawable.nonavailable));
+                }
+
                 break;
 
             case R.id.nv_users:
@@ -441,11 +464,5 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
         }
         return true;
     }
-
-    private void setEstado() {
-        estado = !estado;
-        
-    }
-
 
 }
