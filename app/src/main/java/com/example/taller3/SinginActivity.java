@@ -261,7 +261,8 @@ public class SinginActivity extends AppCompatActivity {
 
     private void updateUI (FirebaseUser user){
         if(user != null){
-            startActivity(new Intent(this, HomeScreenMapsActivity.class));
+            startActivity(new Intent(this, HomeScreenMapsActivity.class
+            ));
 
         }else{
             email.setText("");

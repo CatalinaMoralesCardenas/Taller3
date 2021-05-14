@@ -83,7 +83,6 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
     private GoogleMap mMap;
     private ActivityHomeScreenMapsBinding binding;
     DrawerLayout drawer;
-    CircleImageView imagen;
     NavigationView navigationView;
 
     private Marker locationM;
@@ -131,7 +130,6 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
 
         navigationView = findViewById(R.id.nav_view);
         drawer = findViewById(R.id.drawer_layout);
-        //imagen = findViewById(R.id.imgPerfil);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -150,29 +148,6 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         userID = user.getUid();
-
-       /*FirebaseDatabase.getInstance().
-                        getReference("users").child(userID).addValueEventListener(new ValueEventListener() {
-           @Override
-           public void onDataChange(@NonNull DataSnapshot snapshot) {
-               if(snapshot.exists()){
-                   System.out.println("aaaaaaaaaaa");
-                   System.out.println(snapshot.child("urlProfilePicture").getValue().toString());
-                   Glide.with(HomeScreenMapsActivity.this).
-                           load(snapshot.
-                                   child("urlProfilePicture").
-                                   getValue().toString()).
-                           into(imagen);
-               }
-           }
-
-           @Override
-           public void onCancelled(@NonNull DatabaseError error) {
-
-           }
-       });*/
-
-
 
 
         locationRequest = createLocationRequest();
@@ -481,7 +456,7 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
                 break;
 
             case R.id.nv_users:
-
+                startActivity(new Intent(this, UserListActivity.class));
                 break;
 
             case R.id.nv_logout:
