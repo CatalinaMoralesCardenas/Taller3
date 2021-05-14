@@ -89,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void updateUI (FirebaseUser user){
         if(user != null){
-            startActivity(new Intent(this, UserListActivity.class));
+            startActivity(new Intent(this, HomeScreenMapsActivity.class));
             System.out.println("Logeado");
 
         }else{

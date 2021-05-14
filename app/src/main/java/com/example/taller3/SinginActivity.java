@@ -13,6 +13,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +27,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+
 import com.google.android.gms.tasks.Continuation;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -57,13 +65,18 @@ public class SinginActivity extends AppCompatActivity {
     private StorageReference storageReference;
 
     private String pickerPath;
+    private double longitude;
+    private double latitude;
+    private LocationManager locationManager;
     public static final String TAG = "FB_APP";
 
     private static final int STORAGE_REQUEST = 33;
     private static final int IMAGE_PICKER_REQUEST = 44;
     private static final int REQUEST_IMAGE_CAPTURE = 55;
     private static final int CAMERA_PERMISSION = 66;
+    private static final int LOCATION_CODE = 11;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +91,8 @@ public class SinginActivity extends AppCompatActivity {
         signinButton = findViewById(R.id.signinButton);
 
         password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        longitude = 4.76697;
+        latitude = -73.9665033;
 
         storage = FirebaseStorage.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -126,7 +141,7 @@ public class SinginActivity extends AppCompatActivity {
                                     Log.d(TAG, "createUserWithEmail:success");
                                     FirebaseUser fUser = mAuth.getCurrentUser();
                                     updateUI(fUser);
-                                    User regis = new User(rName, rLastname, rEmail, rPassword, pickerPath, Long.parseLong(rCc), 0.0, 0.0);
+                                    User regis = new User(rName, rLastname, rEmail, rPassword, pickerPath, Long.parseLong(rCc), latitude, longitude);
 
                                     String folder = "users";
                                     FirebaseDatabase.getInstance().getReference(folder)
@@ -246,7 +261,7 @@ public class SinginActivity extends AppCompatActivity {
 
     private void updateUI (FirebaseUser user){
         if(user != null){
-            startActivity(new Intent(this, UserListActivity.class));
+            startActivity(new Intent(this, HomeScreenMapsActivity.class));
 
         }else{
             email.setText("");

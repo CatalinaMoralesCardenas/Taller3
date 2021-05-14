@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/nv_disponbilidad"
+            android:title="Disponibilidad"
+            android:icon="@drawable/ic_disponibilidad"/>
+
+        <item android:id="@+id/nv_users"
+            android:title="Lista de Usuario"
+            android:icon="@drawable/ic_users"/>
+
+        <item android:id="@+id/nv_logout"
+            android:title="Cerrar Sesión"
+            android:icon="@drawable/ic_logout"/>
+
+    </group>
+
+</menu>
