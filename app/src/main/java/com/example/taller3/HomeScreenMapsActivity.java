@@ -76,12 +76,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap mMap;
     private ActivityHomeScreenMapsBinding binding;
     DrawerLayout drawer;
-    ImageView imagen;
+    CircleImageView imagen;
     NavigationView navigationView;
 
     private Marker locationM;
@@ -129,7 +131,7 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
 
         navigationView = findViewById(R.id.nav_view);
         drawer = findViewById(R.id.drawer_layout);
-        imagen = findViewById(R.id.imgPerfil);
+        //imagen = findViewById(R.id.imgPerfil);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -146,7 +148,32 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        //imagenPerfil();
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        userID = user.getUid();
+
+       /*FirebaseDatabase.getInstance().
+                        getReference("users").child(userID).addValueEventListener(new ValueEventListener() {
+           @Override
+           public void onDataChange(@NonNull DataSnapshot snapshot) {
+               if(snapshot.exists()){
+                   System.out.println("aaaaaaaaaaa");
+                   System.out.println(snapshot.child("urlProfilePicture").getValue().toString());
+                   Glide.with(HomeScreenMapsActivity.this).
+                           load(snapshot.
+                                   child("urlProfilePicture").
+                                   getValue().toString()).
+                           into(imagen);
+               }
+           }
+
+           @Override
+           public void onCancelled(@NonNull DatabaseError error) {
+
+           }
+       });*/
+
+
+
 
         locationRequest = createLocationRequest();
         clientLocation = LocationServices.getFusedLocationProviderClient(this);
