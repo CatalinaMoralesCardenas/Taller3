@@ -40,6 +40,8 @@
             android:name=".HomeScreenMapsActivity"
             android:label="@string/title_activity_home_screen_maps"></activity>
         <activity android:name=".SinginActivity" />
+        <activity android:name=".RealTimePositionActivity"></activity>
+        <activity android:name=".UserListActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
