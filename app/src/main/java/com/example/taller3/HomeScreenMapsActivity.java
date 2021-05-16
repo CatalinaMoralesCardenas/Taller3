@@ -5,6 +5,8 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -12,16 +14,21 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -95,9 +102,17 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
     private double latitud;
     private double longitud;
 
+    private int contador = 0;
+    private int contadorAux = 0;
+
     //Permisos
     String permLocation = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final int LOCATION_PERMISSION_ID = 15;
+
+    //Notificacion
+    private static final String CHANNEL_ID = "Notificacion";
+    private int notificationId = 66;
+    Map<String, Boolean> old = new HashMap<>();
 
     //Sensores
     SensorManager sensorManager;
@@ -149,6 +164,11 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
         user = FirebaseAuth.getInstance().getCurrentUser();
         userID = user.getUid();
 
+        mAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        dbReference = database.getReference("users/" + mAuth.getUid());
+
+        createNotificationChannel();
 
         locationRequest = createLocationRequest();
         clientLocation = LocationServices.getFusedLocationProviderClient(this);
@@ -162,17 +182,75 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
             }
         };
 
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference referralRef = rootRef.child("users");
+        referralRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Map<String, Boolean> nuevo = new HashMap<>();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String uid = ds.getKey();
+                    Boolean state = Boolean.parseBoolean(ds.child("availability").getValue().toString());
+                    nuevo.put(uid, state);
+
+                    if (!values.contains(uid)) {
+                        values.add(uid);
+                    }
+                }
+                if (contadorAux == 0) {
+                    old = nuevo;
+                    contadorAux++;
+                }
+                String changed = "";
+                for (String val : values) {
+
+                    if (nuevo.get(val) != old.get(val)) {
+                        changed = val;
+                    }
+                }
+
+                old = nuevo;
+
+                if (!changed.equals("")) {
+                    if (!changed.equals(mAuth.getUid()) && contadorAux > 0 && nuevo.get(changed)) {
+                        //TODO: REVISAR SI ES OTRA PERSONA Y ENVIAR NOTIFICACION
+
+                        dbReference = database.getReference("users/"+changed);
+                        String finalChanged = changed;
+
+                        dbReference.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                User usuarioNotificacion = dataSnapshot.getValue(User.class);
+                                crearNotificacion(usuarioNotificacion.getName(), usuarioNotificacion.getLastname(), finalChanged);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w("RTDB", "error en la consulta", databaseError.toException());
+            }
+
+        });
+
         requestPermission(this, permLocation, "Needed", LOCATION_PERMISSION_ID);
         initView();
 
-    }
 
-    private void imagenPerfil() {
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        userID = user.getUid();
-        dbReference = FirebaseDatabase.getInstance().getReference("users");
 
     }
+
+
 
     private void updateLocation() {
         if (mMap != null) {
@@ -465,6 +543,39 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
                 finish();
         }
         return true;
+    }
+
+    private void crearNotificacion(String nombre,String lastname, String uid){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder( getApplicationContext(), CHANNEL_ID);
+        builder.setSmallIcon(R.drawable.available);
+        builder.setContentTitle("Notificación Cambio de Estado");
+        builder.setContentText("El usuario " + nombre +" "+ lastname +" ahora esta activo!");
+        builder.setColor(Color.BLUE);
+        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        /*Intent intent = new Intent(HomeScreenMapsActivity.this, MainActivity.class);
+        intent.putExtra("uid", uid);
+        intent.putExtra("nombre", nombre);
+        PendingIntent pendingIntent = PendingIntent.getActivity(HomeScreenMapsActivity.this, 0, intent, 0);
+        builder.setContentIntent(pendingIntent);
+        builder.setAutoCancel(true);*/
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(HomeScreenMapsActivity.this);
+        notificationManagerCompat.notify(notificationId, builder.build());
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "CanalNotificaciones";
+            String descripcion = "Cambio en Firebase";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+
+            channel.setDescription(descripcion);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
 }
