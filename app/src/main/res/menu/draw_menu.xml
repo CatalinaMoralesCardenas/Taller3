@@ -3,7 +3,8 @@
     <group android:checkableBehavior="single">
         <item android:id="@+id/nv_disponbilidad"
             android:title="Disponibilidad"
-            android:icon="@drawable/ic_disponibilidad"/>
+            android:icon="@drawable/nonavailable"
+            />
 
         <item android:id="@+id/nv_users"
             android:title="Lista de Usuario"
