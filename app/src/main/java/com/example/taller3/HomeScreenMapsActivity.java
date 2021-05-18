@@ -553,12 +553,11 @@ public class HomeScreenMapsActivity extends AppCompatActivity implements OnMapRe
         builder.setColor(Color.BLUE);
         builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-        /*Intent intent = new Intent(HomeScreenMapsActivity.this, MainActivity.class);
-        intent.putExtra("uid", uid);
-        intent.putExtra("nombre", nombre);
+        Intent intent = new Intent(HomeScreenMapsActivity.this, RealTimePositionActivity.class);
+        intent.putExtra("userKey", uid);
         PendingIntent pendingIntent = PendingIntent.getActivity(HomeScreenMapsActivity.this, 0, intent, 0);
         builder.setContentIntent(pendingIntent);
-        builder.setAutoCancel(true);*/
+        builder.setAutoCancel(true);
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(HomeScreenMapsActivity.this);
         notificationManagerCompat.notify(notificationId, builder.build());

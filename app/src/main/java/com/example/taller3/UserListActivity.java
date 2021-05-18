@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.bumptech.glide.Glide;
@@ -22,8 +24,7 @@ public class UserListActivity extends AppCompatActivity {
 
     private RecyclerView users;
     private FirebaseRecyclerAdapter adapter;
-
-    private StorageReference storageReference;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,7 @@ public class UserListActivity extends AppCompatActivity {
                 .setQuery(query, User.class)
                 .build();
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
         adapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(options) {
 
             @Override
@@ -54,20 +56,23 @@ public class UserListActivity extends AppCompatActivity {
 
             @Override
             protected void onBindViewHolder( UserViewHolder holder, int position, User model) {
-                Glide.with(UserListActivity.this).load(model.getUrlProfilePicture()).into(holder.getProfilePic());
-                holder.getName().setText(model.getName() + " " + model.getLastname());
-                double latitude = model.getLalitude();
-                double longitude = model.getLongitude();
+                String key = this.getRef(position).getKey();
+                if(!key.equals(user.getUid())) {
+                    Glide.with(UserListActivity.this).load(model.getUrlProfilePicture()).into(holder.getProfilePic());
+                    holder.getName().setText(model.getName() + " " + model.getLastname());
 
-                holder.getLocation().setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(UserListActivity.this, RealTimePositionActivity.class);
-                        intent.putExtra("latitude", latitude);
-                        intent.putExtra("longitude", longitude);
-                        startActivity(intent);
-                    }
-                });
+                    holder.getLocation().setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(UserListActivity.this, RealTimePositionActivity.class);
+                            intent.putExtra("userKey", key);
+                            startActivity(intent);
+                        }
+                    });
+                } else {
+                    holder.setIsRecyclable(false);
+                    holder.itemView.setVisibility(View.INVISIBLE);
+                }
             }
         };
 
