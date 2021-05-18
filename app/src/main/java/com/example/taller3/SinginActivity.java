@@ -162,7 +162,7 @@ public class SinginActivity extends AppCompatActivity {
                 final String rEmail = email.getText().toString();
                 final String rPassword = password.getText().toString();
                 final String rCc = cc.getText().toString();
-                final boolean ravail = true;
+                final boolean ravail = false;
 
 
                 mAuth.createUserWithEmailAndPassword(rEmail,rPassword)

@@ -15,7 +15,7 @@ public class User {
     public User() {
     }
 
-    public User(String name, String lastname, String email, String pasword, String urlProfilePicture, long cc, double lalitude, double longitude, boolean avail) {
+    public User(String name, String lastname, String email, String pasword, String urlProfilePicture, long cc, double lalitude, double longitude, boolean availability) {
         this.name = name;
         this.lastname = lastname;
         this.email = email;
@@ -24,7 +24,7 @@ public class User {
         this.cc = cc;
         this.lalitude = lalitude;
         this.longitude = longitude;
-        this.availability = avail;
+        this.availability = availability;
     }
 
     public String getName() {
@@ -91,11 +91,11 @@ public class User {
         this.longitude = longitude;
     }
 
-    public boolean getAvail() {
+    public boolean getavailability() {
         return availability;
     }
 
-    public void setAvail(boolean avail) {
-        this.availability = avail;
+    public void setavailability(boolean availability) {
+        this.availability = availability;
     }
 }
