@@ -6,4 +6,31 @@
     android:layout_height="match_parent"
     tools:context=".RealTimePositionActivity">
 
+    <fragment
+        android:id="@+id/mapPosition"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="5dp"
+        tools:layout_editor_absoluteY="5dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:gravity="bottom|center"
+        tools:ignore="MissingConstraints">
+
+        <TextView
+            android:id="@+id/positionText"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:background="@drawable/roundcorner"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:text="Distancia:"
+            android:textSize="20dp"/>
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
