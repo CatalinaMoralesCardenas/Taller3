@@ -4,12 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,9 +27,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.Continuation;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -59,6 +70,10 @@ public class SinginActivity extends AppCompatActivity {
     private EditText password;
     private EditText cc;
     private Button signinButton;
+    private TextView latitud, longitud;
+    private FusedLocationProviderClient clientLocation;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
 
     private FirebaseAuth mAuth;
     private FirebaseStorage storage;
@@ -89,13 +104,28 @@ public class SinginActivity extends AppCompatActivity {
         password = findViewById(R.id.password);
         cc = findViewById(R.id.cc);
         signinButton = findViewById(R.id.signinButton);
+        latitud = findViewById(R.id.tvLatitudRegistro);
+        longitud = findViewById(R.id.tvLongitudRegistro);
 
         password.setTransformationMethod(PasswordTransformationMethod.getInstance());
-        longitude = 4.76697;
-        latitude = -73.9665033;
+
 
         storage = FirebaseStorage.getInstance();
         mAuth = FirebaseAuth.getInstance();
+
+
+        locationRequest = createLocationRequest();
+        clientLocation = LocationServices.getFusedLocationProviderClient(this);
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                Location location = locationResult.getLastLocation();
+                if (location != null) {
+                    updateLocation();
+                }
+            }
+        };
+
 
         urlProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,6 +162,8 @@ public class SinginActivity extends AppCompatActivity {
                 final String rEmail = email.getText().toString();
                 final String rPassword = password.getText().toString();
                 final String rCc = cc.getText().toString();
+                final boolean ravail = true;
+
 
                 mAuth.createUserWithEmailAndPassword(rEmail,rPassword)
                         .addOnCompleteListener(SinginActivity.this, new OnCompleteListener<AuthResult>() {
@@ -141,7 +173,7 @@ public class SinginActivity extends AppCompatActivity {
                                     Log.d(TAG, "createUserWithEmail:success");
                                     FirebaseUser fUser = mAuth.getCurrentUser();
                                     updateUI(fUser);
-                                    User regis = new User(rName, rLastname, rEmail, rPassword, pickerPath, Long.parseLong(rCc), latitude, longitude);
+                                    User regis = new User(rName, rLastname, rEmail, rPassword, pickerPath, Long.parseLong(rCc), latitude, longitude, ravail);
 
                                     String folder = "users";
                                     FirebaseDatabase.getInstance().getReference(folder)
@@ -268,5 +300,105 @@ public class SinginActivity extends AppCompatActivity {
             email.setText("");
             password.setText("");
         }
+    }
+
+    private void updateLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+
+
+            Task<LocationSettingsResponse> result = LocationServices.getSettingsClient(SinginActivity.this).checkLocationSettings(builder.build());
+
+
+            result.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
+                @Override
+                public void onComplete(@NonNull Task<LocationSettingsResponse> task) {
+                    try {
+                        LocationSettingsResponse response = task.getResult(ApiException.class);
+                        // All location settings are satisfied. The client can initialize location
+                        // requests here.
+
+
+                        if (ActivityCompat.checkSelfPermission(SinginActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(SinginActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                            Log.i("LOCATION", "location.toString()");
+                            clientLocation.getLastLocation().addOnSuccessListener(SinginActivity.this, new OnSuccessListener<Location>() {
+                                @Override
+                                public void onSuccess(Location location) {
+                                    if (location != null) {
+                                        Log.i("LOCATION", location.toString());
+                                        longitude= location.getLongitude();
+                                        latitude = location.getLatitude();
+                                        latitud.setText(Double.toString(location.getLatitude()));
+                                        longitud.setText(Double.toString(location.getLongitude()));
+                                    }
+                                }
+                            });
+                        }
+
+                    } catch (ApiException exception) {
+                        switch (exception.getStatusCode()) {
+                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                                // Location settings are not satisfied. But could be fixed by showing the
+                                // user a dialog.
+                                try {
+                                    // Cast to a resolvable exception.
+                                    ResolvableApiException resolvable = (ResolvableApiException) exception;
+                                    // Show the dialog by calling startResolutionForResult(),
+                                    // and check the result in onActivityResult().
+                                    resolvable.startResolutionForResult(SinginActivity.this, LocationRequest.PRIORITY_HIGH_ACCURACY);
+                                } catch (IntentSender.SendIntentException e) {
+                                    // Ignore the error.
+                                } catch (ClassCastException e) {
+                                    // Ignore, should be an impossible error.
+                                }
+                                break;
+                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                                // Location settings are not satisfied. However, we have no way to fix the
+                                // settings so we won't show the dialog.
+                                break;
+                        }
+                    }
+                }
+            });
+
+
+        }
+
+    }
+
+    private LocationRequest createLocationRequest() {
+        LocationRequest myRequest = new LocationRequest();
+        myRequest.setInterval(1000);
+        myRequest.setFastestInterval(5000);
+        myRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return myRequest;
+    }
+
+    private void startLocationUpdates() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            clientLocation.requestLocationUpdates(locationRequest, locationCallback, null); }
+    }
+
+    private void stopLocationUpdates(){
+        clientLocation.removeLocationUpdates(locationCallback);
+
+    }
+
+    //Subscripciones
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startLocationUpdates();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
     }
 }
