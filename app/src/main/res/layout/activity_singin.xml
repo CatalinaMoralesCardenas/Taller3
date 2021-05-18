@@ -14,32 +14,34 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="15dp"
+            android:background="@drawable/main_header"
             android:gravity="center"
             android:orientation="vertical"
-            android:background="@drawable/main_header">
+            android:padding="5dp"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="-110dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="30dp"
+                android:padding="20dp"
                 android:text="@string/singinPage"
                 android:textColor="@color/black"
                 android:textSize="30sp"
-                android:textStyle="bold|italic"/>
+                android:textStyle="bold|italic" />
 
             <LinearLayout
                 android:layout_width="295dp"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/urlProfilePicture"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/profile"/>
+                    android:src="@drawable/profile" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -52,10 +54,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:backgroundTint="@color/black"
+                        android:gravity="center"
                         android:hint="@string/name"
                         android:textColor="@color/black"
-                        android:gravity="center"
-                        android:textSize="18sp"/>
+                        android:textSize="18sp" />
 
                     <EditText
                         android:id="@+id/lastname"
@@ -63,10 +65,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:backgroundTint="@color/black"
+                        android:gravity="center"
                         android:hint="@string/lastname"
                         android:textColor="@color/black"
-                        android:gravity="center"
-                        android:textSize="18sp"/>
+                        android:textSize="18sp" />
 
                     <EditText
                         android:id="@+id/email"
@@ -74,10 +76,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:backgroundTint="@color/black"
+                        android:gravity="center"
                         android:hint="@string/email"
                         android:textColor="@color/black"
-                        android:gravity="center"
-                        android:textSize="18sp"/>
+                        android:textSize="18sp" />
 
                     <EditText
                         android:id="@+id/password"
@@ -85,10 +87,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:backgroundTint="@color/black"
+                        android:gravity="center"
                         android:hint="@string/password"
                         android:textColor="@color/black"
-                        android:gravity="center"
-                        android:textSize="18sp"/>
+                        android:textSize="18sp" />
 
                     <EditText
                         android:id="@+id/cc"
@@ -96,16 +98,39 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:backgroundTint="@color/black"
+                        android:gravity="center"
                         android:hint="@string/cc"
                         android:textColor="@color/black"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/tvLatitudRegistro"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:backgroundTint="@color/black"
                         android:gravity="center"
-                        android:textSize="18sp"/>
+                        android:hint="Latitud"
+                        android:textColor="@color/black"
+                        android:textSize="18sp" />
+
+
+                    <TextView
+                        android:id="@+id/tvLongitudRegistro"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:backgroundTint="@color/black"
+                        android:gravity="center"
+                        android:hint="Longitud"
+                        android:textColor="@color/black"
+                        android:textSize="18sp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingTop="40dp"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:paddingTop="40dp">
 
                         <Button
                             android:id="@+id/signinButton"
@@ -115,7 +140,7 @@
                             android:text="@string/create"
                             android:textColor="@color/black"
                             android:textSize="20sp"
-                            android:textStyle="bold|italic"/>
+                            android:textStyle="bold|italic" />
 
                     </LinearLayout>
 
